@@ -131,6 +131,10 @@ revoke select (contact_name, contact_phone, contact_email) on projects from anon
 -- These are automatically bypassed with service_role key
 
 -- ── Seed Sample Data ──
+insert into womb_users (name, email, password, role) values
+  ('WOMB Admin', 'admin@womb.local', '$2a$10$elQBKRxNasewJo3L6OCO9eNThm7rbWAbbazazjrBYTV/p2ukzedWK', 'admin')
+on conflict (email) do nothing;
+
 insert into products (vendor_id, name, category, price, image, description, brand, stock) values
   (null, 'BeamX 350W BWS Moving Head Light', 'lighting', 450000.00, 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=800&q=80', 'Ultra-bright 350W hybrid moving head beam fixture for arena concerts and stage events.', 'Chauvet Pro', 12),
   (null, 'Acoustics K2 Dual 12-inch Line Array Speaker', 'audio', 1850000.00, 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80', 'High-power dual 12" touring line array enclosure with crystal clear throw distance.', 'L-Acoustics', 8),
