@@ -99,9 +99,12 @@ create table if not exists orders (
   email text,
   total_amount numeric(12, 2) not null,
   paystack_reference text unique,
+  cart_items jsonb default '[]'::jsonb,
   status text default 'pending', -- pending, paid, shipped, cancelled
   created_at timestamptz default now()
 );
+
+alter table orders add column if not exists cart_items jsonb default '[]'::jsonb;
 
 -- ── Row Level Security (RLS) Policies ──
 -- Allow public read access to marketplace tables

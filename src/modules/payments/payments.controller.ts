@@ -22,6 +22,7 @@ export const initializePayment = async (req: Request, res: Response) => {
       total_amount: amount,
       paystack_reference: paystackResponse.data.reference,
       status: 'pending',
+      cart_items: cartItems || [],
     });
 
     return res.json({

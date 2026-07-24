@@ -18,8 +18,9 @@ export const register = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'User with this email already exists.' });
     }
 
+    const safeRole = role === 'admin' ? 'customer' : role;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await dbCreateUser({ name, email, password: hashedPassword, role });
+    const newUser = await dbCreateUser({ name, email, password: hashedPassword, role: safeRole });
 
     const token = jwt.sign(
       { id: newUser.id, email: newUser.email, role: newUser.role },
@@ -30,7 +31,7 @@ export const register = async (req: Request, res: Response) => {
     return res.status(201).json({
       message: 'Account created successfully',
       token,
-      user: { id: newUser.id, name, email, role },
+      user: { id: newUser.id, name, email, role: newUser.role },
     });
   } catch (error: any) {
     return res.status(500).json({ error: error.message || 'Registration failed' });

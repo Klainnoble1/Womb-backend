@@ -86,6 +86,7 @@
     }
   ],
   "projectBids": [],
+  "orders": [],
   "professionals": [
     {
       "id": 1,
@@ -106,5 +107,13 @@
       "projects_completed": 85
     }
   ],
-  "users": []
+  "users": [
+    {
+      "id": 1,
+      "name": "WOMB Admin",
+      "email": "admin@womb.local",
+      "password": "$2a$10$elQBKRxNasewJo3L6OCO9eNThm7rbWAbbazazjrBYTV/p2ukzedWK",
+      "role": "admin"
+    }
+  ]
 }

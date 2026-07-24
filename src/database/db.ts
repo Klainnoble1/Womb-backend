@@ -67,6 +67,17 @@ export interface ProjectBid {
   created_at: string;
 }
 
+export interface Order {
+  id: number;
+  user_id?: number | string;
+  email: string;
+  total_amount: number;
+  paystack_reference: string;
+  status: string;
+  cart_items?: unknown;
+  created_at: string;
+}
+
 export interface Professional {
   id: number;
   name: string;
@@ -90,6 +101,7 @@ class LocalFallbackStore {
   rentals: Rental[] = [];
   projects: Project[] = [];
   projectBids: ProjectBid[] = [];
+  orders: Order[] = [];
   professionals: Professional[] = [];
   users: User[] = [];
 
@@ -101,6 +113,7 @@ class LocalFallbackStore {
         this.rentals = data.rentals || [];
         this.projects = data.projects || [];
         this.projectBids = data.projectBids || [];
+        this.orders = data.orders || [];
         this.professionals = data.professionals || [];
         this.users = data.users || [];
       } catch {
@@ -114,7 +127,7 @@ class LocalFallbackStore {
   save() {
     fs.writeFileSync(
       STORE_PATH,
-      JSON.stringify({ products: this.products, rentals: this.rentals, projects: this.projects, projectBids: this.projectBids, professionals: this.professionals, users: this.users }, null, 2)
+      JSON.stringify({ products: this.products, rentals: this.rentals, projects: this.projects, projectBids: this.projectBids, orders: this.orders, professionals: this.professionals, users: this.users }, null, 2)
     );
   }
 
@@ -134,11 +147,20 @@ class LocalFallbackStore {
       { id: 2, title: 'Corporate Excellence Awards Audio & LED Rig', event_type: 'Corporate Event', budget: 6500000, location: 'Transcorp Hilton, Abuja', description: 'Requires P2.5 LED wall screens, line array audio, and podium lighting.', status: 'Open for Bids' },
     ];
     this.projectBids = [];
+    this.orders = [];
     this.professionals = [
       { id: 1, name: 'Tunde Adeleke', role: 'Senior Lighting Designer (LD)', hourly_rate: 35000, avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80', rating: '5.0', projects_completed: 68 },
       { id: 2, name: 'Emeka Nwosu', role: 'FOH Sound Engineer', hourly_rate: 40000, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80', rating: '4.9', projects_completed: 85 },
     ];
-    this.users = [];
+    this.users = [
+      {
+        id: 1,
+        name: 'WOMB Admin',
+        email: 'admin@womb.local',
+        password: '$2a$10$elQBKRxNasewJo3L6OCO9eNThm7rbWAbbazazjrBYTV/p2ukzedWK',
+        role: 'admin',
+      },
+    ];
     this.save();
   }
 }
@@ -301,14 +323,22 @@ export async function dbCreateProfessional(professional: Omit<Professional, 'id'
   }
 }
 
-export async function dbCreateOrder(order: { user_id?: number; email: string; total_amount: number; paystack_reference: string; status: string }) {
+export async function dbCreateOrder(order: { user_id?: number | string; email: string; total_amount: number; paystack_reference: string; status: string; cart_items?: unknown }) {
+  const payload = {
+    ...order,
+    created_at: new Date().toISOString(),
+  };
+
   try {
-    const { data, error } = await getSupabase().from('orders').insert(order).select().single();
+    const { data, error } = await getSupabase().from('orders').insert(payload).select().single();
     if (error) throw error;
     return data;
   } catch (err) {
     console.error('[DB Order Error]', err);
-    return { id: Date.now(), ...order };
+    const newOrder = { id: Date.now(), ...payload };
+    localFallback.orders.unshift(newOrder);
+    localFallback.save();
+    return newOrder;
   }
 }
 
@@ -318,7 +348,36 @@ export async function dbUpdateOrderStatus(reference: string, status: string) {
     if (error) throw error;
   } catch (err) {
     console.error('[DB Update Order Error]', err);
+    const order = localFallback.orders.find((item) => item.paystack_reference === reference);
+    if (order) {
+      order.status = status;
+      localFallback.save();
+    }
   }
+}
+
+export async function dbGetOrdersByEmail(email: string) {
+  try {
+    const { data, error } = await getSupabase().from('orders').select('*').eq('email', email).order('id', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  } catch {
+    return localFallback.orders.filter((order) => order.email.toLowerCase() === email.toLowerCase());
+  }
+}
+
+export async function dbGetDashboardByEmail(email: string) {
+  const submittedProjects = (await dbGetProjects({ includeContact: true }))
+    .filter((project) => project.contact_email?.toLowerCase() === email.toLowerCase());
+  const projectIds = new Set(submittedProjects.map((project) => project.id));
+  const bids = (await dbGetProjectBids()).filter((bid) => projectIds.has(bid.project_id));
+  const orders = await dbGetOrdersByEmail(email);
+
+  return {
+    submittedProjects,
+    bids,
+    orders,
+  };
 }
 
 export async function dbFindUserByEmail(email: string) {

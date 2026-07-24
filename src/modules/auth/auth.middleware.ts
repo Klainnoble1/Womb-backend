@@ -33,3 +33,11 @@ export function requireVendor(req: AuthenticatedRequest, res: Response, next: Ne
 
   return next();
 }
+
+export function requireAdmin(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'An admin account is required for this action.' });
+  }
+
+  return next();
+}
