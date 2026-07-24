@@ -1,0 +1,8 @@
+
+CREATE TABLE users(id SERIAL PRIMARY KEY,email TEXT UNIQUE,role TEXT);
+CREATE TABLE vendors(id SERIAL PRIMARY KEY,user_id INT,name TEXT);
+CREATE TABLE products(id SERIAL PRIMARY KEY,vendor_id INT,name TEXT,price NUMERIC);
+CREATE TABLE projects(id SERIAL PRIMARY KEY,title TEXT,description TEXT);
+CREATE TABLE rentals(id SERIAL PRIMARY KEY,name TEXT,daily_rate NUMERIC);
+CREATE TABLE orders(id SERIAL PRIMARY KEY,user_id INT,total NUMERIC);
+CREATE TABLE payments(id SERIAL PRIMARY KEY,order_id INT,provider TEXT,status TEXT);

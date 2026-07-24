@@ -1,0 +1,110 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "vendor_id": 1,
+      "name": "BeamX 350W BWS Moving Head Light",
+      "category": "lighting",
+      "price": 450000,
+      "image": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=800&q=80",
+      "description": "Ultra-bright 350W hybrid moving head beam fixture for arena concerts.",
+      "brand": "Chauvet Pro",
+      "stock": 12
+    },
+    {
+      "id": 2,
+      "vendor_id": 1,
+      "name": "Acoustics K2 Dual 12\" Line Array Speaker",
+      "category": "audio",
+      "price": 1850000,
+      "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80",
+      "description": "High-power touring line array with crystal clear throw distance.",
+      "brand": "L-Acoustics",
+      "stock": 8
+    },
+    {
+      "id": 3,
+      "vendor_id": 2,
+      "name": "CyberLaser 20W RGB High Power Projector",
+      "category": "lasers",
+      "price": 1200000,
+      "image": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80",
+      "description": "Full color 20W RGB diode laser with Pangolin FB4 control.",
+      "brand": "Kvant",
+      "stock": 5
+    },
+    {
+      "id": 4,
+      "vendor_id": 2,
+      "name": "ProTruss Aluminum Concert Stage System",
+      "category": "staging",
+      "price": 3500000,
+      "image": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80",
+      "description": "Heavy duty F34 aluminum square truss stage roof system.",
+      "brand": "Global Truss",
+      "stock": 3
+    }
+  ],
+  "rentals": [
+    {
+      "id": 1,
+      "item_name": "MA Lighting grandMA3 Light Console (Rental)",
+      "category": "lighting",
+      "daily_rate": 150000,
+      "image": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=800&q=80",
+      "location": "Lagos, Nigeria",
+      "available": true
+    },
+    {
+      "id": 2,
+      "item_name": "DiGiCo SD10 Digital Live Mixing Console",
+      "category": "audio",
+      "daily_rate": 220000,
+      "image": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80",
+      "location": "Abuja, Nigeria",
+      "available": true
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "title": "Neon Pulse Festival 2026 Stage Lighting",
+      "event_type": "Music Festival",
+      "budget": 15000000,
+      "location": "Eko Atlantic, Lagos",
+      "description": "Seeking full stage lighting rig, pixel mapping, and laser control team.",
+      "status": "Open for Bids"
+    },
+    {
+      "id": 2,
+      "title": "Corporate Excellence Awards Audio & LED Rig",
+      "event_type": "Corporate Event",
+      "budget": 6500000,
+      "location": "Transcorp Hilton, Abuja",
+      "description": "Requires P2.5 LED wall screens, line array audio, and podium lighting.",
+      "status": "Open for Bids"
+    }
+  ],
+  "projectBids": [],
+  "professionals": [
+    {
+      "id": 1,
+      "name": "Tunde Adeleke",
+      "role": "Senior Lighting Designer (LD)",
+      "hourly_rate": 35000,
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      "rating": "5.0",
+      "projects_completed": 68
+    },
+    {
+      "id": 2,
+      "name": "Emeka Nwosu",
+      "role": "FOH Sound Engineer",
+      "hourly_rate": 40000,
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+      "rating": "4.9",
+      "projects_completed": 85
+    }
+  ],
+  "users": []
+}
