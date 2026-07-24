@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { dbCreateProfessional, dbGetProfessionals } from '../../database/db';
+import { applyPlatformFee, dbCreateProfessional, dbGetProfessionals, getPlatformFeeBreakdownFromVendorAmount } from '../../database/db';
 
 export const getProfessionals = async (req: Request, res: Response) => {
   try {
@@ -17,14 +17,19 @@ export const createProfessional = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Name, role, hourly rate, and avatar are required.' });
     }
 
+    const vendorAmount = Number(hourly_rate);
     const professional = await dbCreateProfessional({
       name,
       role,
-      hourly_rate: Number(hourly_rate),
+      hourly_rate: applyPlatformFee(vendorAmount),
       avatar,
     });
 
-    return res.status(201).json({ message: 'Professional profile published successfully', professional });
+    return res.status(201).json({
+      message: 'Professional profile published successfully',
+      professional,
+      pricing: getPlatformFeeBreakdownFromVendorAmount(vendorAmount),
+    });
   } catch (error: any) {
     return res.status(500).json({ error: error.message || 'Failed to publish professional profile' });
   }

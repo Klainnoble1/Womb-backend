@@ -10,6 +10,32 @@ export const supabase = SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
   : null;
 
+export const PLATFORM_FEE_RATE = 0.15;
+
+export function applyPlatformFee(amount: number) {
+  return Math.round(amount * (1 + PLATFORM_FEE_RATE));
+}
+
+export function getPlatformFeeBreakdownFromVendorAmount(vendorAmount: number) {
+  const customerAmount = applyPlatformFee(vendorAmount);
+  return {
+    vendor_amount: vendorAmount,
+    platform_fee_rate: PLATFORM_FEE_RATE,
+    platform_fee: customerAmount - vendorAmount,
+    customer_amount: customerAmount,
+  };
+}
+
+export function getPlatformFeeBreakdownFromCustomerAmount(customerAmount: number) {
+  const vendorAmount = Math.round(customerAmount / (1 + PLATFORM_FEE_RATE));
+  return {
+    vendor_amount: vendorAmount,
+    platform_fee_rate: PLATFORM_FEE_RATE,
+    platform_fee: customerAmount - vendorAmount,
+    customer_amount: customerAmount,
+  };
+}
+
 function getSupabase() {
   if (!supabase) {
     throw new Error('Supabase is not configured.');

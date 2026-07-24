@@ -1,5 +1,16 @@
 import { Request, Response } from 'express';
-import { dbCreateProject, dbCreateProjectBid, dbGetProjectBids, dbGetProjects } from '../../database/db';
+import {
+  applyPlatformFee,
+  dbCreateProject,
+  dbCreateProjectBid,
+  dbGetProfessionals,
+  dbGetProducts,
+  dbGetProjectBids,
+  dbGetProjects,
+  dbGetRentals,
+  getPlatformFeeBreakdownFromCustomerAmount,
+  getPlatformFeeBreakdownFromVendorAmount,
+} from '../../database/db';
 import { AuthenticatedRequest } from '../auth/auth.middleware';
 
 export const getProjects = async (req: Request, res: Response) => {
@@ -40,7 +51,36 @@ export const getAdminProjects = async (req: Request, res: Response) => {
   try {
     const projects = await dbGetProjects({ includeContact: true });
     const bids = await dbGetProjectBids();
-    return res.json({ status: 'success', projects, bids });
+    const [products, rentals, professionals] = await Promise.all([
+      dbGetProducts(),
+      dbGetRentals(),
+      dbGetProfessionals(),
+    ]);
+    const listingFees = [
+      ...products.map((item) => ({
+        id: item.id,
+        type: 'Product',
+        title: item.name,
+        pricing: getPlatformFeeBreakdownFromCustomerAmount(Number(item.price)),
+      })),
+      ...rentals.map((item) => ({
+        id: item.id,
+        type: 'Rental',
+        title: item.item_name,
+        pricing: getPlatformFeeBreakdownFromCustomerAmount(Number(item.daily_rate)),
+      })),
+      ...professionals.map((item) => ({
+        id: item.id,
+        type: 'Professional',
+        title: item.name,
+        pricing: getPlatformFeeBreakdownFromCustomerAmount(Number(item.hourly_rate)),
+      })),
+    ];
+    const bidsWithPricing = bids.map((bid) => ({
+      ...bid,
+      pricing: getPlatformFeeBreakdownFromCustomerAmount(Number(bid.amount)),
+    }));
+    return res.json({ status: 'success', projects, bids: bidsWithPricing, listingFees });
   } catch (error: any) {
     return res.status(500).json({ error: error.message || 'Failed to fetch admin projects' });
   }
@@ -54,15 +94,20 @@ export const createProjectBid = async (req: AuthenticatedRequest, res: Response)
       return res.status(400).json({ error: 'Project, amount, and proposal message are required.' });
     }
 
+    const vendorAmount = Number(amount);
     const bid = await dbCreateProjectBid({
       project_id: projectId,
       vendor_id: Number(req.user!.id) || 0,
       vendor_email: req.user!.email,
-      amount: Number(amount),
+      amount: applyPlatformFee(vendorAmount),
       message,
     });
 
-    return res.status(201).json({ message: 'Project bid submitted successfully', bid });
+    return res.status(201).json({
+      message: 'Project bid submitted successfully',
+      bid,
+      pricing: getPlatformFeeBreakdownFromVendorAmount(vendorAmount),
+    });
   } catch (error: any) {
     return res.status(500).json({ error: error.message || 'Failed to submit bid' });
   }
